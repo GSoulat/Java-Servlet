@@ -9,6 +9,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.Session;
 
 /**
  * Servlet implementation class Login
@@ -38,10 +40,18 @@ public class Login extends HttpServlet {
 
 		String login = request.getParameter("txtLogin");
 		String password = request.getParameter("txtPassword");
-		if (login == null)
-			login = "";
-		if (password == null)
-			password = "";
+		if (login == null) login = "";
+		if (password == null) password = "";
+		
+		HttpSession session = request.getSession(true);
+		session.setAttribute("login", login);
+		session.setAttribute("password", password);
+		
+		request.getRequestDispatcher("/login.jsp").forward(request, response);
+		
+		
+		
+		
 		response.setContentType("text/html");
 		try (PrintWriter out = response.getWriter()) {
 			 out.println( "<!DOCTYPE html>" );
@@ -77,15 +87,18 @@ public class Login extends HttpServlet {
 		String login = request.getParameter( "txtLogin" );
         String password = request.getParameter( "txtPassword" );
          
+		HttpSession session = request.getSession(true);
+		session.setAttribute("login", login);
+		session.setAttribute("password", password);
+        
         System.out.println( "in the doPost" );
 
         if ( login.equals( "Bond" ) && password.equals( "007" ) ) {
-            response.setContentType( "text/html" );
-            try ( PrintWriter out = response.getWriter() ) {
-                out.println( "OK" );
-            }
+            request.getRequestDispatcher("/Connected.jsp").forward(request, response);
+            session.setAttribute("isConnected", true);
         } else {
-            doGet( request, response );
+        	request.getRequestDispatcher("/login.jsp").forward(request, response);
+        	session.setAttribute("isConnected", false);
         }
 	}
 
